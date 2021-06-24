@@ -170,9 +170,6 @@ def parse_opt():
                     help='The reward weight from cider')
     parser.add_argument('--bleu_reward_weight', type=float, default=0,
                     help='The reward weight from bleu4')
-    parser.add_argument('--spice_reward_weight', type=float, default=0,
-                    help='The reward weight from spice')
-    
 
 
     # Structure_loss
@@ -200,12 +197,6 @@ def parse_opt():
     parser.add_argument('--sc_sample_method', type=str, default='greedy',
                     help='')
     parser.add_argument('--sc_beam_size', type=int, default=1,
-                    help='')
-
-    # drop_worst applied in google conceptual challenge.
-    parser.add_argument('--drop_worst_after', type=float, default=-1,
-                    help='')
-    parser.add_argument('--drop_worst_rate', type=float, default=0,
                     help='')
 
 

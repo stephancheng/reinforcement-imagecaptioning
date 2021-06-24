@@ -14,12 +14,14 @@ try:
     from pyciderevalcap.cider.cider import Cider
     sys.path.append("coco-caption")
     from pycocoevalcap.bleu.bleu import Bleu
+    from pycocoevalcap.spice.Spice_scorer import Spice
 except:
     print('cider or coco-caption missing')
 
 CiderD_scorer = None
 Cider_scorer = None
 Bleu_scorer = None
+Spice_scorer = None
 #CiderD_scorer = CiderD(df='corpus')
 
 def init_scorer(cached_tokens):
@@ -29,6 +31,8 @@ def init_scorer(cached_tokens):
     Cider_scorer = Cider_scorer or Cider(df=cached_tokens)
     global Bleu_scorer
     Bleu_scorer = Bleu_scorer or Bleu(4)
+    global Spice_scorer
+    Spice_scorer = Spice()
 
 def array_to_str(arr):
     out = ''
@@ -60,18 +64,29 @@ def get_self_critical_reward(greedy_res, data_gts, gen_result, opt):
     res__ = {i: res[i] for i in range(len(res_))}
     gts_ = {i: gts[i // seq_per_img] for i in range(gen_result_size)}
     gts_.update({i+gen_result_size: gts[i] for i in range(batch_size)})
+    
+    # ensemble of reward function
+    
     if opt.cider_reward_weight > 0:
         _, cider_scores = CiderD_scorer.compute_score(gts_, res_)
         print('Cider scores:', _)
     else:
         cider_scores = 0
+        
+    if opt.spice_reward_weight > 0:
+        _, spice_scores = Spice_scorer.compute_score(gts_, res__)
+        print('Spice scores:', _)
+    else:
+        spice_scores = 0
+        
+    
     if opt.bleu_reward_weight > 0:
         _, bleu_scores = Bleu_scorer.compute_score(gts_, res__)
         bleu_scores = np.array(bleu_scores[3])
         print('Bleu scores:', _[3])
     else:
         bleu_scores = 0
-    scores = opt.cider_reward_weight * cider_scores + opt.bleu_reward_weight * bleu_scores
+    scores = opt.cider_reward_weight * cider_scores + opt.bleu_reward_weight * bleu_scores + opt.bleu_reward_weight * spice_scores 
 
     scores = scores[:gen_result_size].reshape(batch_size, seq_per_img) - scores[-batch_size:][:, np.newaxis]
     scores = scores.reshape(gen_result_size)
