@@ -1,6 +1,11 @@
 # An Image Captioning codebase
 
-This is a codebase for image captioning research.
+This is a codebase for image captioning research. 
+For original codebase, please visit: https://github.com/ruotianluo/self-critical.pytorch
+This branch include adjustment for using SPICE as reward function.
+Note that it will call the standford NLP API for the evaluation.
+Please copy the file "Spice_scorer" under directory "coco-caption/pycocoevalcap/spice" after all required setup below.
+
 
 It supports:
 - Self critical training from [Self-critical Sequence Training for Image Captioning](https://arxiv.org/abs/1612.00563)
